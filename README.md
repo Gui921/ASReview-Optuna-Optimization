@@ -65,10 +65,29 @@ The next step was to run the optimization across all datasets simultaneously, ac
 ![All datasets Optimization with accumulative loss](images/all_datasets_optimization.png)
 
 #### Loss Per Dataset
-Instead of simply accumulating losses, each dataset's loss was saved in an array, and the optimization was adjusted to minimize the entire array. This approach provided insights into why certain datasets favored large alpha values, particularly those with steep curves in the simulations.
+Instead of simply accumulating losses, each dataset's loss was saved in an array, and the optimization was adjusted to minimize the entire array. This approach provided insights into why certain datasets favored large alpha values, particularly those with steep curves in the [simulations](https://jteijema.github.io/synergy-simulations-website/#plot_recall_sim_van_de_Schoot_2018).
 
 #### Smart Loss
 A decision was made to retain all datasets, including problematic ones that did not minimize well. A "smart loss" function was developed to assign greater importance to datasets that converged and to penalize those that did not. This ensured that well-performing datasets had a larger impact on the optimization process.
+```
+Function weighted_sum(losses):
+    Initialize weights as an empty list
+    For each loss_value in losses:
+        Append 1 / loss_value to weights
+    
+    Set total_weight to the sum of all values in weights
+    
+    Initialize normalized_weights as an empty list
+    For each weight w in weights:
+        Append w / total_weight to normalized_weights
+    
+    Set weighted_loss to 0
+    For each pair of w, l in normalized_weights and losses:
+        Add (w * l) to weighted_loss
+    
+    Return weighted_loss
+End Function
+```
 
 ## Client
 A Python command-line client was developed to allow users to replicate and run their own simulations without modifying the code. The client offers three main options:
@@ -83,3 +102,31 @@ The structure of the simulation folder is as follows:
     ../db_file
 ```
 The dataset is saved in a “data” folder within the same directory as the Python file. The Fire library was used to implement the command-line interface.
+
+## Adding a new model
+
+To add a new model the following steps must be followes:
+1. Create a new objective file in the objectives folder
+2. Define the objective function:
+    1. With Optuna define all the parameters that are to be optimized
+    2. Initialize the model and feature extractor
+    3. Return the function *optimization_loop* from utils, by passing the model and feature extractor as function parameters
+
+    It should look like this:
+
+    ```
+    def new_objective(trial):
+        Define all the parameters to be optimized
+
+        model = new_model(parameters)
+        feature_extractor= Feature_Extractor()
+        
+        return optimization_loop(model, feature_extractor)
+    ```
+3. Initialize the newly created file in the __init__ file 
+
+After following the steps above, the model should be availabe to be optimized by calling it in the command line:
+
+```
+python main.py optimize NEW_MODEL
+```
