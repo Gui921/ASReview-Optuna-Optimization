@@ -130,3 +130,7 @@ After following the steps above, the model should be availabe to be optimized by
 ```
 python main.py optimize NEW_MODEL
 ```
+
+## Examples:
+
+For examples and other client related information, check the [examples.md file](https://github.com/Gui921/ASReview-Optuna-Optimization/blob/main/examples.md).
