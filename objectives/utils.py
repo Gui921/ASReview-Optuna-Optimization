@@ -1,5 +1,8 @@
 import shutil
 import tempfile
+import os
+
+from scipy.sparse import save_npz, load_npz
 
 from asreview import open_state
 from asreview import ASReviewData
@@ -24,16 +27,19 @@ def optimization_loop(model, feature_extractor):
         with tempfile.TemporaryDirectory() as tmpdir:
 
             project_temp_path = tmpdir + '/api_simulation/'
+            feature_matrix_path = f'data/{d.name}/{feature_extractor.name}_feature_matrix.npz'
             project = ASReviewProject.create(
                 project_path=project_temp_path,
                 project_id="api_example",
                 project_mode="simulate",
                 project_name="api_example",
             )
-
+            if os.path.isdir(feature_matrix_path):
+                feature_matrix = load_npz(feature_matrix_path)
+                project.add_feature_matrix(feature_matrix, feature_extractor.name)
             project_data_path = project_temp_path + 'data/' + d.name + '.csv'
 
-            shutil.copy(f'data/{d.name}.csv' , project_data_path ) 
+            shutil.copy(f'data/{d.name}/{d.name}.csv' , project_data_path ) 
 
             project.add_dataset(project_data_path)
 
@@ -53,6 +59,9 @@ def optimization_loop(model, feature_extractor):
 
             project.update_review(status="review")
             reviewer.review()
+            if not os.path.isdir(feature_matrix_path):
+                feature_matrix = project.get_feature_matrix(feature_extractor.name)
+                save_npz(feature_matrix_path,feature_matrix)
             project.export(project_temp_path + 'output.asreview')
             
             loss_value = None

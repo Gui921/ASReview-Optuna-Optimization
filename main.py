@@ -26,8 +26,10 @@ def build_dataset():
     with Bar('Building dataset...', max=26) as bar:
         for d in iter_datasets():
             dataset_name = d.name
+            if not(os.path.isdir(f'data/{dataset_name}')):
+                os.mkdir(f'data/{dataset_name}')
             d = d.to_frame()
-            dataset_path = f'data/{dataset_name}.csv'
+            dataset_path = f'data/{dataset_name}/{dataset_name}.csv'
             d.to_csv(dataset_path)
             bar.next()
     print("Synergy dataset is ready to be used.")

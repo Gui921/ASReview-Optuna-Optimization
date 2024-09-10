@@ -1,5 +1,5 @@
 # ASReview Hyper-Hyper
-
+**ASReview Hyper-Hyper** is a repository designed to optimize machine learning models within the ASReview ecosystem using the Optuna framework.
 ## Why Optuna?
 Initially, Hyperopt was used for optimization, but after some investigation, Optuna was selected as a better-suited framework. Optuna outperforms Hyperopt in several areas, including ease of use, built-in pruning, visualization capabilities, and faster convergence.
 
