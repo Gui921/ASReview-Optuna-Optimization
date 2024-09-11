@@ -21,6 +21,7 @@ def weighted_sum(losses):
     return weighted_loss
 
 def optimization_loop(model, feature_extractor):
+
     accumulative_score = []
     for d in iter_datasets():
 
@@ -67,6 +68,18 @@ def optimization_loop(model, feature_extractor):
             loss_value = None
             with open_state(project_temp_path + 'output.asreview') as s:
                 loss_value = loss(s)
+            
+            shutil.rmtree(tmpdir)
 
             accumulative_score.append(loss_value)
+    delete_tmp_files()
     return weighted_sum(accumulative_score)
+
+def delete_tmp_files():
+    tmp_path = tempfile.gettempdir()
+
+    for folder in os.listdir(tmp_path):
+        folder_path = os.path.join(tmp_path, folder)
+
+        if folder.startswith('tmp'):
+            shutil.rmtree(folder_path)
