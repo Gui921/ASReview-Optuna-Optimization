@@ -131,7 +131,7 @@ def optimize(model_name, n_trials = 10, study_name = "custom_study",
                 pool.submit(study.optimize, objective, 
                             n_trials = n_trials // number_of_cpu)
     else:
-        study.optimize(objective, n_trials=n_trials)
+        study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
 
 
 

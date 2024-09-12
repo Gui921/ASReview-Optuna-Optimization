@@ -57,11 +57,11 @@ OR
 
     python main.py optimize NaiveBayes --study_name=example --cpu=-1
 
-### Optimize Naive Bayes with a 100 trials:
-    python main.py optimize NaiveBayes -n=100
+### Optimize XGBoost with a 100 trials:
+    python main.py optimize XGBoost -n=100
 OR
 
-    python main.py optimize NaiveBayes --n_trials=100
+    python main.py optimize XGBoost --n_trials=100
 
 ### Create plots:
     python main.py plot study_name

@@ -68,8 +68,6 @@ def optimization_loop(model, feature_extractor):
             loss_value = None
             with open_state(project_temp_path + 'output.asreview') as s:
                 loss_value = loss(s)
-            
-            shutil.rmtree(tmpdir)
 
             accumulative_score.append(loss_value)
     delete_tmp_files()
