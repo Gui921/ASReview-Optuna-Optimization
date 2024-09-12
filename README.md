@@ -125,7 +125,7 @@ To add a new model the following steps must be followes:
     ```
 3. Initialize the newly created file in the __init__ file 
 
-After following the steps above, the model should be availabe to be optimized by calling it in the command line:
+After following the steps above, the model should be available to be optimized by calling it in the command line:
 
 ```
 python main.py optimize NEW_MODEL
