@@ -95,6 +95,7 @@ A Python command-line client was developed to allow users to replicate and run t
 - Optimize a model.
 - Generate plots from the resulting database.
 - Combine all the studies info into an excel file
+
 The structure of the simulation folder is as follows:
 
 ```text
