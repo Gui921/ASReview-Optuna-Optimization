@@ -2,6 +2,7 @@ import sys
 import os
 import multiprocessing
 import json
+import xlsxwriter
 
 from concurrent.futures import ProcessPoolExecutor
 import optuna
@@ -57,6 +58,7 @@ def plot(study_name):
         -------
         A plots folder with the .png files from each plot
     '''
+
     storage = 'sqlite:///' + study_name + '/db.sqlite3'
     study_names = optuna.study.get_all_study_names(
         storage=storage)
@@ -89,6 +91,52 @@ def plot(study_name):
             bar.next()
     print(f"Plots were save in: {study_name}/plots")
 
+def combine(folder_name):
+    '''
+    Function that combines all the info from the config files into an excel file.
+
+    Parameters:
+        folder_name: Folder with all the studies
+    '''
+    workbook = xlsxwriter.Workbook(f'{folder_name}/Combined Studies.xlsx')
+    worksheet = workbook.add_worksheet()
+
+    header_format = workbook.add_format({'bold': True, 'bg_color': 'cyan', 'align': 'center'})
+
+    headers = ['Study Name', 'Model', 'Feature Extractor', 'Value', 'Hyperparameters']
+    worksheet.set_column(0, 4, 20)
+
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header, header_format)
+
+    row = 1 
+
+    for folder in os.listdir(folder_name):
+        config_path = os.path.join(folder_name, folder, 'study_config.json')
+
+        with open(config_path) as json_file:
+            data = json.load(json_file)
+
+            worksheet.write_string(row, 0, folder)
+            worksheet.write_string(row, 1, data['Model'])
+            worksheet.write_string(row, 2, data['Feature Extractor'])
+            worksheet.write_number(row, 3, data['Value'])
+            worksheet.write_string(row, 4, json.dumps(data['Best Hyperparameters']))
+            row += 1
+
+    table_range = f'A1:E{row}'
+
+    worksheet.add_table(table_range, {
+        'columns': [{'header': 'Study Name'},
+                    {'header': 'Model'},
+                    {'header': 'Feature Extractor'},
+                    {'header': 'Value'},
+                    {'header': 'Hyperparameters'}],
+        'autofilter': True,  # Add autofilter to the table
+    })
+
+    workbook.close()
+
 def optimize(model_name, feature_extractor_name, n_trials = 10, study_name = "custom_study", 
               cpu = 1):
     '''
@@ -120,7 +168,6 @@ def optimize(model_name, feature_extractor_name, n_trials = 10, study_name = "cu
     if not feature_Extractor:
         print(f"Feature Extractor: '{feature_Extractor}' is not supported. Available models: {', '.join(FEATURE_EXTRACTORS.keys())}.")# noqa E501
         sys.exit(1)
-
 
     if cpu == -1:
         number_of_cpu = multiprocessing.cpu_count()
@@ -176,6 +223,7 @@ if __name__ == '__main__':
     fire.Fire({
         'optimize': optimize,
         'build_dataset': build_dataset,
-        'plot': plot
+        'plot': plot,
+        'combine': combine
     })
     

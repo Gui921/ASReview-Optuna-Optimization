@@ -2,12 +2,19 @@
 **To build a dataset:**
 
     python main.py build_dataset
+
 **To optimize:**
 
     python main.py optimize
+
 **To create the plots:**
 
     python main.py plot
+
+**To combine many studies**
+
+    python main.py combine
+
 **For help:**
 
     python main.py --help 
@@ -54,6 +61,32 @@ DB_STORAGE
         If --cpu = -1, then the maximum CPU availability will be used.
 
 ---
+
+## COMBINE
+    main.py combine
+
+### SYNOPSIS
+    main.py combine FOLDER_NAME  
+
+### POSITIONAL ARGUMENTS
+    FOLDER_NAME
+        Name of the folder with all the studies to combine
+
+### HOW TO COMBINE
+
+To combine many studies, you need to create a folder and move all the studies that are to be combined into that folder. Resulting in a structure like this:
+
+        ../combine_folder
+            ../study_folder_1
+            ../study_folder_2
+            ../study_folder_3
+                ...
+After preparing the folders, you just need to call the function on the combine folder, like this:
+
+    python main.py combine combine_folder
+
+---
+
 ## Available Models and Feature Extractors
 ### Models:
 * NaiveBayes
