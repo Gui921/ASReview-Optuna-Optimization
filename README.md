@@ -99,7 +99,8 @@ The structure of the simulation folder is as follows:
 ```text
 ../simulation_name
     ../plots
-    ../db_file
+    ../db_file.sqlite3
+    ../config_file.json
 ```
 The dataset is saved in a “data” folder within the same directory as the Python file. The Fire library was used to implement the command-line interface.
 

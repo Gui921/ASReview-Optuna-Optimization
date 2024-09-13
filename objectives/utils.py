@@ -14,6 +14,16 @@ from asreviewcontrib.insights.metrics import loss
 from synergy_dataset import iter_datasets
 
 def weighted_sum(losses):
+    '''
+    Function that calculates the final loss that is to be optimized by penalizing big losses and
+    favouring small losses.
+
+    Params:
+        losses: List of all the losses
+    
+    Returns:
+        weighted_loss: Weighed Loss from all the losses
+    '''
     weights = [1 / loss_value for loss_value in losses]
     total_weight = sum(weights)
     normalized_weights = [w / total_weight for w in weights]
@@ -21,7 +31,16 @@ def weighted_sum(losses):
     return weighted_loss
 
 def optimization_loop(model, feature_extractor):
+    '''
+    Main loop of the optimization process where it loops through all the datasets and 
+    computes the final loss
 
+    Params:
+        model: Model to be optimized
+        feature_extractor: Feature Extractor to be used in the simulation
+    Returns:
+        Final loss
+    '''
     accumulative_score = []
     for d in iter_datasets():
 
@@ -74,6 +93,9 @@ def optimization_loop(model, feature_extractor):
     return weighted_sum(accumulative_score)
 
 def delete_tmp_files():
+    ''''
+    Function to delete all the temporary files
+    '''
     tmp_path = tempfile.gettempdir()
 
     for folder in os.listdir(tmp_path):

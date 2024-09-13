@@ -1,21 +1,22 @@
 from asreview.models.classifiers import NaiveBayesClassifier
-from asreview.models.feature_extraction import Tfidf
 from .utils import optimization_loop
 
-def NaiveBayes(trial):
+class NaiveBayes:
     """
-    Objective function for optimizing the Naive Bayes classifier using Optuna.
-    
-    Parameters:
-        trial: An Optuna trial object that suggests hyperparameters.
-    
+    Objective class for optimizing the Naive Bayes classifier using Optuna.
+
+    Arguments:
+        feature_extractor: Feature Extracture model to be used in the simulation
+        
     Returns:
         final_loss: A weighted loss from all datasets.
     """
+    def __init__(self, feature_extractor):
+        self.feature_extractor = feature_extractor()
 
-    alpha_value = trial.suggest_float('alpha', 0.1, 10.0, log = True)
-    
-    model = NaiveBayesClassifier(alpha=alpha_value)
-    feature_extractor= Tfidf()
+    def __call__(self, trial):
 
-    return optimization_loop(model, feature_extractor)
+        alpha_value = trial.suggest_float('alpha', 0.1, 10.0, log = True)
+        model = NaiveBayesClassifier(alpha=alpha_value)
+
+        return optimization_loop(model, self.feature_extractor)

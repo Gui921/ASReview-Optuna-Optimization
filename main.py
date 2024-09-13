@@ -1,6 +1,7 @@
 import sys
 import os
 import multiprocessing
+import json
 
 from concurrent.futures import ProcessPoolExecutor
 import optuna
@@ -10,7 +11,7 @@ import fire
 from progress.bar import Bar
 
 from synergy_dataset import iter_datasets
-from objectives import OBJECTIVES
+from objectives import OBJECTIVES, FEATURE_EXTRACTORS
 
 def build_dataset():
     '''
@@ -20,10 +21,13 @@ def build_dataset():
         -------
         CSV files for each dataset are saved in the 'data' directory.
     '''
+
     if not(os.path.isdir('data')):
         os.mkdir('data')
 
-    with Bar('Building dataset...', max=26) as bar:
+    dataset_count = sum(1 for _ in iter_datasets())
+
+    with Bar('Building dataset...', max=dataset_count) as bar:
         for d in iter_datasets():
             dataset_name = d.name
             if not(os.path.isdir(f'data/{dataset_name}')):
@@ -85,7 +89,7 @@ def plot(study_name):
             bar.next()
     print(f"Plots were save in: {study_name}/plots")
 
-def optimize(model_name, n_trials = 10, study_name = "custom_study", 
+def optimize(model_name, feature_extractor_name, n_trials = 10, study_name = "custom_study", 
               cpu = 1):
     '''
     Function that optimizes a model given the set of parameters defined.
@@ -104,11 +108,17 @@ def optimize(model_name, n_trials = 10, study_name = "custom_study",
         Number of CPUs allocated for the task
         Default: 1
     '''
+
     objective = OBJECTIVES.get(model_name, None)
+    feature_Extractor = FEATURE_EXTRACTORS.get(feature_extractor_name, None)
 
     if not objective:
         print(f"Model '{model_name}' is not supported. Available models: {', '.join(OBJECTIVES.keys())}.")# noqa E501
         sys.exit(1)
+    if not feature_Extractor:
+        print(f"Feature Extractor: '{feature_Extractor}' is not supported. Available models: {', '.join(FEATURE_EXTRACTORS.keys())}.")# noqa E501
+        sys.exit(1)
+
 
     if cpu == -1:
         number_of_cpu = multiprocessing.cpu_count()
@@ -125,15 +135,40 @@ def optimize(model_name, n_trials = 10, study_name = "custom_study",
                                 study_name=study_name,
                                 storage=storage_name, sampler=TPESampler(), 
                                 load_if_exists=True)
-    if number_of_cpu != 1:
+    
+    if number_of_cpu != 1 and n_trials>= number_of_cpu:
         with ProcessPoolExecutor(max_workers=number_of_cpu) as pool:
             for _ in range(number_of_cpu):
-                pool.submit(study.optimize, objective, 
-                            n_trials = n_trials // number_of_cpu)
+                pool.submit(study.optimize, objective(feature_Extractor), 
+                        n_trials = n_trials // number_of_cpu)
+                
+    elif number_of_cpu != 1 and n_trials < number_of_cpu:
+        with ProcessPoolExecutor(max_workers=n_trials) as pool:
+            for _ in range(n_trials):
+                pool.submit(study.optimize, objective(feature_Extractor), 
+                        n_trials = 1)
     else:
-        study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+        study.optimize(objective(feature_Extractor), n_trials=n_trials)
 
+    best_trial = study.best_trial
 
+    file_output = {
+        'Model': model_name,
+        'Feature Extractor': feature_extractor_name,
+        'Value': best_trial.value,
+        'Best Hyperparameters': best_hyp(best_trial)
+    }
+    json_object = json.dumps(file_output, indent=4)
+
+    with open(study_name +'/study_config.json', 'w') as outfile:
+        outfile.write(json_object)
+
+def best_hyp(trial):
+    dic = {}
+    for key, value in trial.params.items():
+        dic[key] = str(value)
+    
+    return dic
 
 if __name__ == '__main__':
     fire.Fire({
