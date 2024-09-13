@@ -33,10 +33,13 @@ DB_STORAGE
     main.py optimize
 
 ### SYNOPSIS
-    main.py optimize MODEL_NAME <flags>  
+    main.py optimize MODEL_NAME FEATURE_EXTRACTOR_NAME <flags>  
 
 ### POSITIONAL ARGUMENTS
     MODEL_NAME
+        Name of the model to optimize
+    FEATURE_EXTRACTOR_NAME
+        Name of the feature extractor to be used in the simulations
 
 ### FLAGS
     -n, --n_trials=N_TRIALS
@@ -51,6 +54,25 @@ DB_STORAGE
         If --cpu = -1, then the maximum CPU availability will be used.
 
 ---
+## Available Models and Feature Extractors
+### Models:
+* NaiveBayes
+* NN_2_Layer
+* XGBoost
+* DynamicNN
+* Logistic
+* RandomForest
+* SVM
+* AdaBoost
+
+### Feature Extractors:
+* Tfidf
+* SBERT
+* Doc2Vec
+* LaBSE
+* MXBAI
+
+---
 
 # EXAMPLES:
 
@@ -58,16 +80,16 @@ DB_STORAGE
     python main.py build_dataset
 
 ### Optimize Naive Bayes with a different name and with parallelization:
-    python main.py optimize NaiveBayes -s=example -c=-1
+    python main.py optimize NaiveBayes Tfidf -s=example -c=-1
 OR
 
-    python main.py optimize NaiveBayes --study_name=example --cpu=-1
+    python main.py optimize NaiveBayes Tfidf --study_name=example --cpu=-1
 
 ### Optimize XGBoost with a 100 trials:
-    python main.py optimize XGBoost -n=100
+    python main.py optimize XGBoost Doc2vec-n=100
 OR
 
-    python main.py optimize XGBoost --n_trials=100
+    python main.py optimize XGBoost Doc2vec --n_trials=100
 
 ### Create plots:
     python main.py plot study_name

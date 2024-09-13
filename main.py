@@ -98,6 +98,8 @@ def optimize(model_name, feature_extractor_name, n_trials = 10, study_name = "cu
     ----------
     model_name : String
         Name of the model to optimize
+    feature_extractor_name: String
+        Name of the feature extractor to be used in the simulations
     n_trials : int, optional
         Number of trials of the optimization process
         Default: 10
