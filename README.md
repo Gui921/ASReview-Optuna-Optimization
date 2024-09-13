@@ -90,10 +90,11 @@ End Function
 ```
 
 ## Client
-A Python command-line client was developed to allow users to replicate and run their own simulations without modifying the code. The client offers three main options:
+A Python command-line client was developed to allow users to replicate and run their own simulations without modifying the code. The client offers four options:
 - Download the Synergy Dataset.
 - Optimize a model.
 - Generate plots from the resulting database.
+- Combine all the studies info into an excel file
 The structure of the simulation folder is as follows:
 
 ```text
